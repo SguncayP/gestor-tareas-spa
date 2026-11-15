@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 // Muestra uno de los estados de la interfaz: cargando, éxito, vacío o error.
 // Los errores se anuncian con role="alert" y el resto con role="status" para lectores de pantalla.
-defineProps({
-  tipo: { type: String, required: true, validator: (v) => ['cargando', 'exito', 'vacio', 'error'].includes(v) },
-  mensaje: { type: String, required: true },
-  reintentable: { type: Boolean, default: false },
-});
-defineEmits(['reintentar']);
+defineProps<{
+  tipo: 'cargando' | 'exito' | 'vacio' | 'error';
+  mensaje: string;
+  reintentable?: boolean;
+}>();
+defineEmits<{ reintentar: [] }>();
 </script>
 
 <template>

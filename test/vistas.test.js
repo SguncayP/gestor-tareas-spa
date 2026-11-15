@@ -1,22 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, mount as montar } from '@vue/test-utils';
 import { createMemoryHistory, createRouter } from 'vue-router';
-import { ErrorApi } from '../src/services/http.js';
+import { ErrorApi } from '../src/services/http';
 
-vi.mock('../src/services/tareasApi.js', () => ({
+vi.mock('../src/services/tareasApi', () => ({
   listar: vi.fn(),
   crear: vi.fn(),
   actualizar: vi.fn(),
   eliminar: vi.fn(),
   subirAdjunto: vi.fn(),
 }));
-vi.mock('../src/services/authApi.js', () => ({ yo: vi.fn(), login: vi.fn(), registro: vi.fn(), logout: vi.fn() }));
+vi.mock('../src/services/authApi', () => ({ yo: vi.fn(), login: vi.fn(), registro: vi.fn(), logout: vi.fn() }));
 
-import * as tareasApi from '../src/services/tareasApi.js';
-import * as authApi from '../src/services/authApi.js';
+import * as tareasApi from '../src/services/tareasApi';
+import * as authApi from '../src/services/authApi';
 import TareasView from '../src/views/TareasView.vue';
-import { guardia } from '../src/router.js';
-import { useSesion } from '../src/composables/useSesion.js';
+import { guardia } from '../src/router';
+import { useSesion } from '../src/composables/useSesion';
 
 const vacio = { render: () => null };
 const enrutador = createRouter({

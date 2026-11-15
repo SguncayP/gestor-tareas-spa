@@ -1,9 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'vue-router';
 import BarraNavegacion from './components/BarraNavegacion.vue';
 import EstadoMensaje from './components/EstadoMensaje.vue';
-import { useSesion } from './composables/useSesion.js';
-import { useConexion } from './composables/useConexion.js';
+import { useSesion } from './composables/useSesion';
+import { useConexion } from './composables/useConexion';
 
 const router = useRouter();
 const { usuario, salir } = useSesion();

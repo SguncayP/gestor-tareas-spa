@@ -1,12 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSesion } from '../composables/useSesion.js';
+import { useSesion } from '../composables/useSesion';
+import type { DatosAcceso } from '../services/authApi';
 
 const router = useRouter();
 const { entrar } = useSesion();
 
-const modo = ref('login'); // login | registro
+const modo = ref<'login' | 'registro'>('login');
 const nombre = ref('');
 const email = ref('');
 const password = ref('');
@@ -14,7 +15,7 @@ const error = ref('');
 const enviando = ref(false);
 const esRegistro = computed(() => modo.value === 'registro');
 
-function cambiarModo(nuevo) {
+function cambiarModo(nuevo: 'login' | 'registro') {
   modo.value = nuevo;
   error.value = '';
 }
@@ -27,12 +28,12 @@ async function enviar() {
   }
   enviando.value = true;
   try {
-    const datos = { email: email.value, password: password.value };
+    const datos: DatosAcceso = { email: email.value, password: password.value };
     if (esRegistro.value) datos.nombre = nombre.value.trim();
     await entrar(modo.value, datos);
     router.push({ name: 'tareas' });
   } catch (e) {
-    error.value = e.message;
+    error.value = e instanceof Error ? e.message : 'Error desconocido';
   } finally {
     enviando.value = false;
   }

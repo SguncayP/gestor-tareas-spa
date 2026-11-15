@@ -1,12 +1,11 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 
 // Formulario de nueva tarea: valida en el cliente y emite los datos; no llama a la API.
-const props = defineProps({
-  ocupado: { type: Boolean, default: false },
-  error: { type: String, default: '' }, // error devuelto por el servidor
-});
-const emit = defineEmits(['crear', 'editar']);
+import type { DatosTarea } from '../types';
+
+const props = withDefaults(defineProps<{ ocupado?: boolean; error?: string }>(), { ocupado: false, error: '' }); // error: lo devuelve el servidor
+const emit = defineEmits<{ crear: [datos: DatosTarea]; editar: [] }>();
 
 const titulo = ref('');
 const descripcion = ref('');

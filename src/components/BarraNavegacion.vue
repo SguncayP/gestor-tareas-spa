@@ -1,7 +1,9 @@
-<script setup>
+<script setup lang="ts">
 // Presenta el nombre de la app y el usuario; solo avisa con un evento cuando se pide salir.
-defineProps({ usuario: { type: Object, default: null } });
-defineEmits(['salir']);
+import type { Usuario } from '../types';
+
+defineProps<{ usuario: Usuario | null }>();
+defineEmits<{ salir: [] }>();
 </script>
 
 <template>

@@ -1,12 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import TareaItem from './TareaItem.vue';
 
 // Recorre las tareas con clave estable (id) y reenvía los eventos de cada elemento.
-defineProps({
-  tareas: { type: Array, required: true },
-  ocupados: { type: Array, default: () => [] }, // ids con una operación en curso
-});
-defineEmits(['cambiar-estado', 'eliminar', 'adjuntar']);
+import type { EstadoTarea, Tarea } from '../types';
+
+withDefaults(defineProps<{ tareas: Tarea[]; ocupados?: string[] }>(), { ocupados: () => [] }); // ocupados: ids con una operación en curso
+defineEmits<{
+  'cambiar-estado': [datos: { id: string; estado: EstadoTarea }];
+  eliminar: [datos: { id: string }];
+  adjuntar: [datos: { id: string; archivo: File }];
+}>();
 </script>
 
 <template>

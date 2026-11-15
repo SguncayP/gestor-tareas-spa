@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ErrorApi, esCancelada, pedir } from '../src/services/http.js';
+import { ErrorApi, esCancelada, pedir } from '../src/services/http';
 
 const respuesta = (estado, cuerpo) => ({
   ok: estado >= 200 && estado < 300,

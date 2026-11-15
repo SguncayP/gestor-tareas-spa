@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useSesion } from '../composables/useSesion.js';
-import * as tareasApi from '../services/tareasApi.js';
-import { esCancelada } from '../services/http.js';
+import { useSesion } from '../composables/useSesion';
+import * as tareasApi from '../services/tareasApi';
+import { ErrorApi, esCancelada } from '../services/http';
+import type { DatosTarea, EstadoTarea, Tarea } from '../types';
 import EstadoMensaje from '../components/EstadoMensaje.vue';
 import FiltroEstado from '../components/FiltroEstado.vue';
 import TareaForm from '../components/TareaForm.vue';
@@ -13,19 +14,21 @@ const router = useRouter();
 const { usuario, sinConexion, cargar: cargarSesion } = useSesion();
 
 // Vista con el estado de las tareas: aquí viven los datos, la carga y los avisos.
-const tareas = ref([]);
-const carga = ref('cargando'); // cargando | listo | error
+const tareas = ref<Tarea[]>([]);
+const carga = ref<'cargando' | 'listo' | 'error'>('cargando');
 const errorCarga = ref('');
 const filtro = ref('');
 const aviso = ref('');
 const errorAccion = ref('');
 const errorForm = ref('');
 const creando = ref(false);
-const ocupados = ref([]);
-const formulario = ref(null);
+const ocupados = ref<string[]>([]);
+const formulario = ref<InstanceType<typeof TareaForm> | null>(null);
 
 let ultimaPeticion = 0;
-let temporizador = null;
+let temporizador: ReturnType<typeof setTimeout> | undefined;
+
+const mensajeDe = (error: unknown) => (error instanceof Error ? error.message : 'Error desconocido');
 
 // Si el filtro cambia mientras hay una carga en curso, solo cuenta la última petición
 async function cargar() {
@@ -45,34 +48,34 @@ async function cargar() {
     carga.value = 'listo';
   } catch (error) {
     if (numero !== ultimaPeticion || esCancelada(error)) return;
-    if (error.estado === 401) return router.push({ name: 'login' });
-    errorCarga.value = error.message;
+    if (error instanceof ErrorApi && error.estado === 401) return router.push({ name: 'login' });
+    errorCarga.value = mensajeDe(error);
     carga.value = 'error';
   }
 }
 
-function mostrarAviso(texto) {
+function mostrarAviso(texto: string) {
   aviso.value = texto;
   clearTimeout(temporizador);
   temporizador = setTimeout(() => (aviso.value = ''), 3500);
 }
 
 // Ejecuta una operación sobre una tarea marcándola como ocupada mientras dura
-async function conOcupado(id, operacion) {
+async function conOcupado(id: string, operacion: () => Promise<void>) {
   errorAccion.value = '';
   ocupados.value = [...ocupados.value, id];
   try {
     await operacion();
   } catch (error) {
-    errorAccion.value = error.message;
+    errorAccion.value = mensajeDe(error);
   } finally {
     ocupados.value = ocupados.value.filter((x) => x !== id);
   }
 }
 
-const reemplazar = (nueva) => (tareas.value = tareas.value.map((t) => (t.id === nueva.id ? nueva : t)));
+const reemplazar = (nueva: Tarea) => (tareas.value = tareas.value.map((t) => (t.id === nueva.id ? nueva : t)));
 
-async function crear(datos) {
+async function crear(datos: DatosTarea) {
   creando.value = true;
   errorForm.value = '';
   try {
@@ -81,14 +84,15 @@ async function crear(datos) {
     formulario.value?.limpiar();
     mostrarAviso('Tarea creada');
   } catch (error) {
-    errorForm.value = error.message;
+    errorForm.value = mensajeDe(error);
   } finally {
     creando.value = false;
   }
 }
 
-function cambiarEstado({ id, estado }) {
+function cambiarEstado({ id, estado }: { id: string; estado: EstadoTarea }) {
   const tarea = tareas.value.find((t) => t.id === id);
+  if (!tarea) return;
   return conOcupado(id, async () => {
     const nueva = await tareasApi.actualizar(id, { titulo: tarea.titulo, descripcion: tarea.descripcion, estado });
     if (filtro.value && filtro.value !== nueva.estado) {
@@ -100,7 +104,7 @@ function cambiarEstado({ id, estado }) {
   });
 }
 
-function eliminar({ id }) {
+function eliminar({ id }: { id: string }) {
   return conOcupado(id, async () => {
     await tareasApi.eliminar(id);
     tareas.value = tareas.value.filter((t) => t.id !== id);
@@ -108,7 +112,7 @@ function eliminar({ id }) {
   });
 }
 
-function adjuntar({ id, archivo }) {
+function adjuntar({ id, archivo }: { id: string; archivo: File }) {
   return conOcupado(id, async () => {
     reemplazar(await tareasApi.subirAdjunto(id, archivo));
     mostrarAviso('Imagen adjuntada');

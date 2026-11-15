@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useSesion } from './composables/useSesion.js';
-import LoginView from './views/LoginView.vue';
-import TareasView from './views/TareasView.vue';
+import type { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
+import { useSesion } from '../composables/useSesion';
+import LoginView from '../views/LoginView.vue';
+import TareasView from '../views/TareasView.vue';
 
 export const rutas = [
   { path: '/', redirect: '/tareas' },
@@ -11,7 +12,7 @@ export const rutas = [
 ];
 
 // Guardia de navegación: protege las rutas privadas y evita volver al login con sesión abierta
-export async function guardia(to) {
+export async function guardia(to: Pick<RouteLocationNormalized, 'name' | 'meta'>): Promise<true | RouteLocationRaw> {
   const { usuario, sinConexion, cargar } = useSesion();
   await cargar();
   // Sin conexión no se puede saber si hay sesión: se deja entrar y la vista mostrará el aviso y el reintento

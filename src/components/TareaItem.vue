@@ -1,21 +1,25 @@
-<script setup>
+<script setup lang="ts">
 // Muestra una tarea. Recibe los datos por props (sin modificarlos) y emite eventos con el id.
-const props = defineProps({
-  tarea: { type: Object, required: true },
-  ocupado: { type: Boolean, default: false },
-});
-const emit = defineEmits(['cambiar-estado', 'eliminar', 'adjuntar']);
+import type { EstadoTarea, Tarea } from '../types';
 
-const ETIQUETAS = { pendiente: 'Pendiente', en_progreso: 'En progreso', completada: 'Completada' };
+const props = withDefaults(defineProps<{ tarea: Tarea; ocupado?: boolean }>(), { ocupado: false });
+const emit = defineEmits<{
+  'cambiar-estado': [datos: { id: string; estado: EstadoTarea }];
+  eliminar: [datos: { id: string }];
+  adjuntar: [datos: { id: string; archivo: File }];
+}>();
 
-function cambiarEstado(evento) {
-  emit('cambiar-estado', { id: props.tarea.id, estado: evento.target.value });
+const ETIQUETAS: Record<EstadoTarea, string> = { pendiente: 'Pendiente', en_progreso: 'En progreso', completada: 'Completada' };
+
+function cambiarEstado(evento: Event) {
+  emit('cambiar-estado', { id: props.tarea.id, estado: (evento.target as HTMLSelectElement).value as EstadoTarea });
 }
 
-function elegirArchivo(evento) {
-  const archivo = evento.target.files[0];
+function elegirArchivo(evento: Event) {
+  const campo = evento.target as HTMLInputElement;
+  const archivo = campo.files?.[0];
   if (archivo) emit('adjuntar', { id: props.tarea.id, archivo });
-  evento.target.value = '';
+  campo.value = '';
 }
 </script>
 
