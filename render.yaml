@@ -1,4 +1,4 @@
-# Sitio estático en Render. Cambia API_URL por la dirección de tu API desplegada.
+# Sitio estático en Render. Las reglas rewrite reenvían /api y /uploads a la API desplegada.
 services:
   - type: web
     name: gestor-tareas-spa
@@ -12,10 +12,10 @@ services:
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://API_URL/api/*
+        destination: https://gestor-tareas-api-eq85.onrender.com/api/*
       - type: rewrite
         source: /uploads/*
-        destination: https://API_URL/uploads/*
+        destination: https://gestor-tareas-api-eq85.onrender.com/uploads/*
       - type: rewrite
         source: /*
         destination: /index.html
