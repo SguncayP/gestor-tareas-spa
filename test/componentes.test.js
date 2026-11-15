@@ -54,6 +54,17 @@ describe('TareaForm', () => {
     expect(envoltura.find('#titulo').element.value).toBe('');
   });
 
+  it('al escribir emite editar y borra el error local', async () => {
+    const envoltura = mount(TareaForm);
+    await envoltura.find('#titulo').setValue('ab');
+    await envoltura.find('form').trigger('submit');
+    expect(envoltura.find('.error').text()).not.toBe('');
+
+    await envoltura.find('#titulo').setValue('abc');
+    expect(envoltura.emitted('editar')).toBeTruthy();
+    expect(envoltura.find('.error').text()).toBe('');
+  });
+
   it('muestra el error que llega del servidor y bloquea el botón mientras guarda', () => {
     const envoltura = mount(TareaForm, { props: { error: 'Ya tienes una tarea con ese título', ocupado: true } });
     expect(envoltura.find('.error').text()).toContain('Ya tienes una tarea');

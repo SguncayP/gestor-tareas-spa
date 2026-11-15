@@ -124,7 +124,7 @@ onUnmounted(() => clearTimeout(temporizador));
   <section aria-labelledby="titulo-tareas" class="vista">
     <h1 id="titulo-tareas">Mis tareas</h1>
 
-    <TareaForm ref="formulario" :ocupado="creando" :error="errorForm" @crear="crear" />
+    <TareaForm ref="formulario" :ocupado="creando" :error="errorForm" @crear="crear" @editar="errorForm = ''" />
 
     <EstadoMensaje v-if="aviso" tipo="exito" :mensaje="aviso" />
     <EstadoMensaje v-if="errorAccion" tipo="error" :mensaje="errorAccion" />
