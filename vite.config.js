@@ -1,0 +1,15 @@
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+// En desarrollo, las peticiones a /api y /uploads se reenvían a la API de la unidad 2
+export default defineConfig({
+  plugins: [vue()],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:3000',
+      '/uploads': 'http://localhost:3000',
+    },
+  },
+  test: { environment: 'jsdom' },
+});

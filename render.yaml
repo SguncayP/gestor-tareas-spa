@@ -1,0 +1,21 @@
+# Sitio estático en Render. Cambia API_URL por la dirección de tu API desplegada.
+services:
+  - type: web
+    name: gestor-tareas-spa
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://API_URL/api/*
+      - type: rewrite
+        source: /uploads/*
+        destination: https://API_URL/uploads/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
